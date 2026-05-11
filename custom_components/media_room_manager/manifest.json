@@ -1,0 +1,13 @@
+{
+  "domain": "media_room_manager",
+  "name": "Media Room Manager",
+  "version": "0.0.1",
+  "documentation": "https://github.com/evanrkeller/media_room_manager",
+  "issue_tracker": "https://github.com/evanrkeller/media_room_manager/issues",
+  "codeowners": ["@evanrkeller"],
+  "config_flow": true,
+  "iot_class": "local_push",
+  "requirements": [],
+  "dependencies": [],
+  "integration_type": "service"
+}
