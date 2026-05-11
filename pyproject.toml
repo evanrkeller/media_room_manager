@@ -1,0 +1,80 @@
+[project]
+name = "media-room-manager-dev"
+version = "0.0.0"
+description = "Dev tooling config for our shadow build of Media Room Manager. The integration itself is loaded by Home Assistant via custom_components/, not via pip."
+requires-python = ">=3.13"
+
+[project.optional-dependencies]
+dev = [
+    "homeassistant==2026.2.3",
+    "pytest-homeassistant-custom-component==0.13.316",
+    "voluptuous>=0.15",
+    "ruff>=0.15",
+    "mypy>=2.0",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff — lint + format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# Match Home Assistant's lint conventions where reasonable.
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E501",  # line length is enforced by formatter
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.media_room_manager"]
+force-sort-within-sections = true
+
+[tool.ruff.format]
+# Default formatter config — double quotes, Black-compatible.
+
+# ---------------------------------------------------------------------------
+# mypy — strict type checking on the integration package
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+warn_unused_ignores = true
+# Home Assistant has incomplete type stubs in many places; allow gradual typing
+# at module boundaries we don't control.
+ignore_missing_imports = true
+# HA's submodule __init__ files use implicit re-exports (e.g.,
+# `websocket_api.websocket_command` is re-exported from `decorators` without
+# `as` aliasing). Strict mode disables implicit re-exports — re-enable for
+# HA compatibility so our code can use its API surface idiomatically.
+implicit_reexport = true
+# `custom_components/` is the conventional HA layout — no `__init__.py` at the
+# `custom_components/` level, but our code imports as `custom_components.*`.
+# These two settings stop mypy from seeing the same module via two paths.
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "."
+
+# ---------------------------------------------------------------------------
+# pytest — test discovery + HA async harness
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra"
+filterwarnings = [
+    "error::DeprecationWarning:custom_components",
+    "error::DeprecationWarning:tests",
+]

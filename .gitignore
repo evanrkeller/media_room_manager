@@ -1,0 +1,20 @@
+# Local Claude Code overlays — personal/fork-specific, not shared upstream.
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
