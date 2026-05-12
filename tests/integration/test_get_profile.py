@@ -26,7 +26,12 @@ async def _setup(hass: HomeAssistant) -> None:
 async def test_get_profile_returns_full_profile_for_known_id(
     hass: HomeAssistant, hass_ws_client: WebSocketGenerator
 ) -> None:
-    """AC: get_profile returns identity + structural fields for a valid id."""
+    """AC: get_profile returns identity + structural fields for a valid id.
+
+    Asserts exact values from the bundled `apple_tv_4k` fixture so a
+    regression that returns wrong profile data fails this test (rather
+    than passing on type checks alone).
+    """
     await _setup(hass)
     client = await hass_ws_client(hass)
     await client.send_json_auto_id(
@@ -37,23 +42,26 @@ async def test_get_profile_returns_full_profile_for_known_id(
     assert response["success"], response
     profile = response["result"]
 
-    # Identity fields
+    # Identity fields — exact values from apple_tv_4k.yaml
     assert profile["profile_id"] == "apple_tv_4k"
     assert profile["manufacturer"] == "Apple"
     assert profile["model"] == "TV 4K"
     assert profile["category"] == "streamer"
 
-    # Structural fields (presence, not deep shape — schema loose for now)
-    assert profile["power_handling"] in {
-        "discrete_capable",
-        "toggle",
-        "always_on",
-        "disabled",
-    }
-    assert isinstance(profile["power_on_delay"], int)
-    assert isinstance(profile["output_groups"], list)
-    assert isinstance(profile["interfaces"], list)
-    assert isinstance(profile["virtual_sources"], list)
+    # Structural fields — exact values from apple_tv_4k.yaml
+    assert profile["power_handling"] == "discrete_capable"
+    assert profile["power_on_delay"] == 0
+    assert profile["output_groups"] == [{"id": "hdmi_out"}]
+    assert profile["interfaces"] == [
+        {
+            "id": "hdmi",
+            "direction": "output",
+            "type": "hdmi",
+            "label": "HDMI",
+            "output_group": "hdmi_out",
+        }
+    ]
+    assert profile["virtual_sources"] == []
 
 
 async def test_get_profile_unknown_id_returns_error(
