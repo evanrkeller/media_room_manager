@@ -2,3 +2,14 @@ profile_id: apple_tv_4k
 manufacturer: Apple
 model: TV 4K
 category: streamer
+power_handling: discrete_capable
+power_on_delay: 0
+output_groups:
+  - id: hdmi_out
+interfaces:
+  - id: hdmi
+    direction: output
+    type: hdmi
+    label: HDMI
+    output_group: hdmi_out
+virtual_sources: []

@@ -8,7 +8,7 @@ Per the project's `CLAUDE.md` boundary, any change to this surface — adding, r
 
 ### `media_room_manager/list_profiles`
 
-Return all device profiles known to the integration's bundled library.
+Return all device profiles known to the integration's bundled library — identity fields only. For the full structural detail of a single profile, use [`get_profile`](#media_room_managerget_profile).
 
 **Parameters:** none.
 
@@ -57,6 +57,85 @@ If no profiles are bundled, the response is an empty array `[]` (never an error)
 ```
 
 **Added in:** v0.0.1 (story #45).
+
+---
+
+### `media_room_manager/get_profile`
+
+Return the full profile for a given `profile_id`, including identity fields and structural fields (output groups, interfaces, virtual sources, power handling).
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `profile_id` | string | yes | The id of the profile to retrieve. |
+
+**Response (success):** an object containing identity and structural fields.
+
+| Field | Type | Description |
+|---|---|---|
+| `profile_id` | string | Stable identifier for the profile. |
+| `manufacturer` | string | Device manufacturer. |
+| `model` | string | Device model. |
+| `category` | string | Device category. |
+| `power_handling` | string | One of `discrete_capable`, `toggle`, `always_on`, `disabled`. See `CLAUDE.md`. |
+| `power_on_delay` | integer | Seconds the orchestrator should wait after sending power-on before issuing further commands. Defaults to `0`. |
+| `output_groups` | array of objects | Device-internal output groups. The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape used by bundled profiles. |
+| `interfaces` | array of objects | Physical input/output interfaces. The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape (direction, type, label, output_group / routable_to_output_group). |
+| `virtual_sources` | array of objects | Static virtual sources declared by the profile (e.g., an AVR's tuner). The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape. |
+
+**Error responses:** `success` is `false` and `error.code` is one of:
+
+| `error.code` | When | `error.message` |
+|---|---|---|
+| `not_found` | The given `profile_id` is not registered. | Names the unknown `profile_id`. |
+| `invalid_format` | `profile_id` is missing or not a string (HA's WebSocket schema layer). | HA-supplied schema-validation message. |
+| `not_loaded` | The integration's profile registry has not been initialized — typically transient during startup, before `async_setup_entry` has populated `hass.data[DOMAIN]`. | Indicates the registry is not loaded. |
+
+**Example request:**
+
+```json
+{
+  "id": 8,
+  "type": "media_room_manager/get_profile",
+  "profile_id": "apple_tv_4k"
+}
+```
+
+**Example response:**
+
+```json
+{
+  "id": 8,
+  "type": "result",
+  "success": true,
+  "result": {
+    "profile_id": "apple_tv_4k",
+    "manufacturer": "Apple",
+    "model": "TV 4K",
+    "category": "streamer",
+    "power_handling": "discrete_capable",
+    "power_on_delay": 0,
+    "output_groups": [
+      {"id": "hdmi_out"}
+    ],
+    "interfaces": [
+      {
+        "id": "hdmi",
+        "direction": "output",
+        "type": "hdmi",
+        "label": "HDMI",
+        "output_group": "hdmi_out"
+      }
+    ],
+    "virtual_sources": []
+  }
+}
+```
+
+**Added in:** v0.0.2 (story #46).
+
+---
 
 ## Stability
 
