@@ -80,25 +80,17 @@ Return the full profile for a given `profile_id`, including identity fields and 
 | `category` | string | Device category. |
 | `power_handling` | string | One of `discrete_capable`, `toggle`, `always_on`, `disabled`. See `CLAUDE.md`. |
 | `power_on_delay` | integer | Seconds the orchestrator should wait after sending power-on before issuing further commands. Defaults to `0`. |
-| `output_groups` | array of objects | Device-internal output groups. Each entry has at minimum an `id`. Inner shape is loose at this stage; later commands may surface a tighter contract. |
-| `interfaces` | array of objects | Physical input/output interfaces. Outputs declare `output_group`; inputs declare `routable_to_output_group`. |
-| `virtual_sources` | array of objects | Static virtual sources declared by the profile (e.g., an AVR's tuner). |
+| `output_groups` | array of objects | Device-internal output groups. The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape used by bundled profiles. |
+| `interfaces` | array of objects | Physical input/output interfaces. The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape (direction, type, label, output_group / routable_to_output_group). |
+| `virtual_sources` | array of objects | Static virtual sources declared by the profile (e.g., an AVR's tuner). The schema accepts arbitrary objects in this list — see `docs/profile-schema.md` for the conventional shape. |
 
-**Response (error — unknown profile):**
+**Error responses:** `success` is `false` and `error.code` is one of:
 
-| Field | Value |
-|---|---|
-| `success` | `false` |
-| `error.code` | `not_found` |
-| `error.message` | Names the unknown `profile_id`. |
-
-**Response (error — missing or wrong-type `profile_id`):**
-
-| Field | Value |
-|---|---|
-| `success` | `false` |
-| `error.code` | `invalid_format` |
-| `error.message` | HA-supplied schema-validation message. |
+| `error.code` | When | `error.message` |
+|---|---|---|
+| `not_found` | The given `profile_id` is not registered. | Names the unknown `profile_id`. |
+| `invalid_format` | `profile_id` is missing or not a string (HA's WebSocket schema layer). | HA-supplied schema-validation message. |
+| `not_loaded` | The integration's profile registry has not been initialized — typically transient during startup, before `async_setup_entry` has populated `hass.data[DOMAIN]`. | Indicates the registry is not loaded. |
 
 **Example request:**
 

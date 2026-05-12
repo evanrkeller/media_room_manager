@@ -121,4 +121,4 @@ def test_profile_is_frozen() -> None:
         power_handling="discrete_capable",
     )
     with pytest.raises(FrozenInstanceError):
-        profile.profile_id = "changed"  # type: ignore[misc]
+        profile.profile_id = "changed"  # type: ignore[misc]  # intentional mutation to assert frozen=True rejects it
