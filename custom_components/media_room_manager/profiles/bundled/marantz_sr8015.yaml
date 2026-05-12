@@ -2,3 +2,22 @@ profile_id: marantz_sr8015
 manufacturer: Marantz
 model: SR8015
 category: avr
+power_handling: discrete_capable
+power_on_delay: 0
+output_groups:
+  - id: main
+interfaces:
+  - id: hdmi_1
+    direction: input
+    type: hdmi
+    label: HDMI 1
+    routable_to_output_group: [main]
+  - id: hdmi_out_main
+    direction: output
+    type: hdmi
+    label: HDMI Out (Main)
+    output_group: main
+virtual_sources:
+  - id: tuner
+    label: AM/FM Tuner
+    routable_to_output_group: main

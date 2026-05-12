@@ -16,7 +16,8 @@ def _write_profile(tmp_path: Path, profile_id: str, category: str = "streamer") 
         f"profile_id: {profile_id}\n"
         f"manufacturer: TestMfr\n"
         f"model: TestModel\n"
-        f"category: {category}\n",
+        f"category: {category}\n"
+        f"power_handling: discrete_capable\n",
         encoding="utf-8",
     )
 
@@ -57,8 +58,8 @@ def test_load_ignores_non_yaml_files(tmp_path: Path) -> None:
 def test_registry_list_all_returns_sorted_profiles() -> None:
     """Sort ordering is documented in `ProfileRegistry.list_all`'s docstring."""
     profiles = {
-        "z_profile": Profile("z_profile", "Z", "z", "streamer"),
-        "a_profile": Profile("a_profile", "A", "a", "avr"),
+        "z_profile": Profile("z_profile", "Z", "z", "streamer", "discrete_capable"),
+        "a_profile": Profile("a_profile", "A", "a", "avr", "discrete_capable"),
     }
     registry = ProfileRegistry(profiles)
     ids = [p.profile_id for p in registry.list_all()]
@@ -66,7 +67,7 @@ def test_registry_list_all_returns_sorted_profiles() -> None:
 
 
 def test_registry_get_known_profile_returns_it() -> None:
-    profile = Profile("apple_tv_4k", "Apple", "TV 4K", "streamer")
+    profile = Profile("apple_tv_4k", "Apple", "TV 4K", "streamer", "discrete_capable")
     registry = ProfileRegistry({"apple_tv_4k": profile})
     assert registry.get("apple_tv_4k") is profile
 
